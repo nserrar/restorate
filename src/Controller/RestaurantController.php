@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\Media;
 use App\Entity\Restaurant;
 use App\Form\RestaurantType;
 use App\Repository\RestaurantRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * @Route("/restaurant")
@@ -21,20 +24,55 @@ class RestaurantController extends AbstractController
     public function index(RestaurantRepository $restaurantRepository): Response
     {
         return $this->render('restaurant/index.html.twig', [
-            'restaurants' => $restaurantRepository->findAll(),
+            'restaurants' => $restaurantRepository->getNLastRestaurant(10),
+        ]);
+
+
+    }
+
+    /**
+     * @Route("/", name="app_restaurant_search", methods={"POST"})
+     */
+    public function searchByCodePostal(Request $request, RestaurantRepository $restaurantRepository): Response
+    {
+        $postalCode = $request->request->get('search');
+        return $this->render('restaurant/index.html.twig', [
+            'restaurants' => $restaurantRepository->getRestaurantsByPostalCode($postalCode),
         ]);
     }
 
     /**
      * @Route("/new", name="app_restaurant_new", methods={"GET", "POST"})
      */
-    public function new(Request $request, RestaurantRepository $restaurantRepository): Response
+    public function new(Request $request, RestaurantRepository $restaurantRepository, SluggerInterface $slugger): Response
     {
         $restaurant = new Restaurant();
         $form = $this->createForm(RestaurantType::class, $restaurant);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $mediaFile = $form->get('mediaFile')->getData();
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $restaurant->setOwner($user);
+            if ($mediaFile) {
+                $media = new Media();
+                $media->setRestaurant($restaurant);
+                $originalFilename = pathinfo($mediaFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$mediaFile->guessExtension();
+
+                try {
+                    $mediaFile->move(
+                        'media/',
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                $media->setFile($newFilename);
+            }
+
             $restaurantRepository->add($restaurant);
             return $this->redirectToRoute('app_restaurant_index', [], Response::HTTP_SEE_OTHER);
         }

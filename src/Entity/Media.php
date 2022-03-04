@@ -24,7 +24,7 @@ class Media
 
     /**
      * @ORM\ManyToOne(targetEntity=Restaurant::class, inversedBy="medias")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $restaurant;
 

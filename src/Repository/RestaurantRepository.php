@@ -45,6 +45,25 @@ class RestaurantRepository extends ServiceEntityRepository
         }
     }
 
+    public function getNLastRestaurant($limit){
+        return $this->createQueryBuilder('r')
+            ->orderBy('r.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    public function getRestaurantsByPostalCode($postalCode){
+        return $this->createQueryBuilder('r')
+            ->where('r.postalCode = :postalCode')
+            ->setParameter('postalCode', $postalCode)
+            ->orderBy('r.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
     // /**
     //  * @return Restaurant[] Returns an array of Restaurant objects
     //  */

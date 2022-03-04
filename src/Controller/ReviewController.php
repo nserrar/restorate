@@ -35,6 +35,8 @@ class ReviewController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $review->setUser($user);
             $reviewRepository->add($review);
             return $this->redirectToRoute('app_review_index', [], Response::HTTP_SEE_OTHER);
         }

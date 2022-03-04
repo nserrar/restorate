@@ -15,7 +15,6 @@ class ReviewType extends AbstractType
             ->add('comment')
             ->add('rating')
             ->add('restaurant')
-            ->add('user')
         ;
     }
 

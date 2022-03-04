@@ -31,20 +31,27 @@ class Restaurant
     private $city;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class)
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="restaurants")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
      */
     private $owner;
 
     /**
      * @ORM\OneToMany(targetEntity=Media::class, mappedBy="restaurant", orphanRemoval=true)
+     * @ORM\JoinColumn(nullable=false)
      */
     private $medias;
 
     /**
      * @ORM\OneToMany(targetEntity=Review::class, mappedBy="restaurant", orphanRemoval=true)
+     * @ORM\JoinColumn(nullable=false)
      */
     private $reviews;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $postalCode;
 
     public function __construct()
     {
@@ -136,20 +143,64 @@ class Restaurant
     }
 
     /**
-     * @return mixed
+     * @return Collection<int, Review>
      */
-    public function getMedias()
+    public function getMedias(): Collection
     {
         return $this->medias;
     }
 
+    public function addMedia(Media $media): self
+    {
+        if (!$this->medias->contains($media)) {
+            $this->medias[] = $media;
+            $media->setRestaurant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(Media $media): self
+    {
+        if ($this->medias->removeElement($media)) {
+            // set the owning side to null (unless already changed)
+            if ($media->getRestaurant() === $this) {
+                $media->setRestaurant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAverageRating() {
+        $sumRating = 0;
+        foreach($this->reviews as $review){
+            $sumRating += $review->getRating();
+        }
+
+        return $sumRating / count($this->reviews);
+    }
+
+    public function __toString()
+    {
+        return $this->name;
+    }
+
     /**
-     * @param mixed $medias
+     * @return mixed
+     */
+    public function getPostalCode()
+    {
+        return $this->postalCode;
+    }
+
+    /**
+     * @param mixed $postalCode
      * @return Restaurant
      */
-    public function setMedias($medias)
+    public function setPostalCode($postalCode)
     {
-        $this->medias = $medias;
+        $this->postalCode = $postalCode;
         return $this;
     }
 }

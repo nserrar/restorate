@@ -61,4 +61,9 @@ class City
         $this->restaurants = $restaurants;
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->name;
+    }
 }

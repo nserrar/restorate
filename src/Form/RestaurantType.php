@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Restaurant;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,7 +15,10 @@ class RestaurantType extends AbstractType
         $builder
             ->add('name')
             ->add('city')
-            ->add('owner')
+            ->add('postalCode')
+            ->add('mediaFile', FileType::class, [
+                'mapped' => false
+            ])
         ;
     }
 

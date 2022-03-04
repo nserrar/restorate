@@ -26,8 +26,8 @@ class Review
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="reviews")
      * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
+     *
+    private $user;*/
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -38,6 +38,12 @@ class Review
      * @ORM\Column(type="integer")
      */
     private $rating;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="reviews")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
 
     public function getId(): ?int
     {
@@ -55,7 +61,7 @@ class Review
 
         return $this;
     }
-
+/*
     public function getUser(): ?User
     {
         return $this->user;
@@ -67,7 +73,7 @@ class Review
 
         return $this;
     }
-
+*/
     public function getComment(): ?string
     {
         return $this->comment;
@@ -88,6 +94,18 @@ class Review
     public function setRating(int $rating): self
     {
         $this->rating = $rating;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

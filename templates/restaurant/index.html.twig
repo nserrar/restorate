@@ -1,15 +1,21 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Restaurant index{% endblock %}
 
 {% block body %}
     <h1>Restaurant index</h1>
+    <form class="form-horizontal" target="{{ path('app_restaurant_search') }}" role="form" method="post">
+        <label for="site-search">Restaurant par code postal:</label>
+        <input type="search" id="site-search" name="search"
+               aria-label="Search through site content">
 
+        <button>Rechercher</button>
+    </form>
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Name</th>
+                <th>Rating (Average)</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -18,6 +24,7 @@
             <tr>
                 <td>{{ restaurant.id }}</td>
                 <td>{{ restaurant.name }}</td>
+                <td>{% if(restaurant.reviews|length > 0) %}{{  restaurant.averageRating  }}{% else %}N/A{% endif %}</td>
                 <td>
                     <a href="{{ path('app_restaurant_show', {'id': restaurant.id}) }}">show</a>
                     <a href="{{ path('app_restaurant_edit', {'id': restaurant.id}) }}">edit</a>
