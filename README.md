@@ -29,4 +29,3 @@ Lancez le server : (verifiez le retour de symfony serv:start l'url y est)
  Les différentes routes du projet : 
  
     php bin/console debug:router
-
